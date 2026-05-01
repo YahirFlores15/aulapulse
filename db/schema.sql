@@ -14,8 +14,6 @@ CREATE TABLE user_roles (
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
   FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE
 );
-CREATE INDEX idx_user_roles_user_id ON user_roles(user_id);
-CREATE INDEX idx_user_roles_role_id ON user_roles(role_id);
 CREATE TABLE groups (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   cycle_id INTEGER NOT NULL,
@@ -79,15 +77,6 @@ CREATE TABLE group_tutors (
   FOREIGN KEY (group_id) REFERENCES groups(id) ON DELETE RESTRICT,
   FOREIGN KEY (tutor_user_id) REFERENCES users(id) ON DELETE RESTRICT
 );
-CREATE INDEX idx_groups_cycle_id ON groups(cycle_id);
-CREATE INDEX idx_group_students_cycle_id ON group_students(cycle_id);
-CREATE INDEX idx_group_students_group_id ON group_students(group_id);
-CREATE INDEX idx_group_students_student_id ON group_students(student_id);
-CREATE INDEX idx_courses_cycle_id ON courses(cycle_id);
-CREATE INDEX idx_courses_group_id ON courses(group_id);
-CREATE INDEX idx_courses_subject_id ON courses(subject_id);
-CREATE INDEX idx_courses_teacher_user_id ON courses(teacher_user_id);
-CREATE INDEX idx_group_tutors_tutor_user_id ON group_tutors(tutor_user_id);
 CREATE TABLE attendance_records (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   course_id INTEGER NOT NULL,
@@ -99,14 +88,6 @@ CREATE TABLE attendance_records (
   FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE,
   FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE
 );
-CREATE UNIQUE INDEX idx_attendance_unique_course_student_date
-  ON attendance_records (course_id, student_id, date);
-CREATE INDEX idx_attendance_course_id
-  ON attendance_records (course_id);
-CREATE INDEX idx_attendance_student_id
-  ON attendance_records (student_id);
-CREATE INDEX idx_attendance_date
-  ON attendance_records (date);
 CREATE TABLE grades (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   course_id INTEGER NOT NULL,
@@ -118,14 +99,6 @@ CREATE TABLE grades (
   FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE,
   FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE
 );
-CREATE UNIQUE INDEX idx_grades_unique_course_student_partial
-  ON grades (course_id, student_id, partial_number);
-CREATE INDEX idx_grades_course_id
-  ON grades (course_id);
-CREATE INDEX idx_grades_student_id
-  ON grades (student_id);
-CREATE INDEX idx_grades_partial_number
-  ON grades (partial_number);
 CREATE TABLE incident_types (
   code TEXT PRIMARY KEY,
   name TEXT NOT NULL,
@@ -149,14 +122,6 @@ REFERENCES users(id) ON DELETE RESTRICT,
   FOREIGN KEY (type_code) REFERENCES incident_types(code) ON DELETE RESTRICT,
   FOREIGN KEY (created_by_user_id) REFERENCES users(id) ON DELETE RESTRICT
 );
-CREATE INDEX idx_incidents_student_id
-  ON incidents (student_id);
-CREATE INDEX idx_incidents_type_code
-  ON incidents (type_code);
-CREATE INDEX idx_incidents_created_by_user_id
-  ON incidents (created_by_user_id);
-CREATE INDEX idx_incidents_created_at
-  ON incidents (created_at);
 CREATE TABLE referral_reason_catalog (
   code TEXT PRIMARY KEY,
   name TEXT NOT NULL,
@@ -199,14 +164,6 @@ CREATE TABLE referral_case_notes (
   FOREIGN KEY (case_id) REFERENCES referral_cases(id) ON DELETE CASCADE,
   FOREIGN KEY (author_user_id) REFERENCES users(id)
 );
-CREATE INDEX idx_referral_cases_student_id ON referral_cases(student_id);
-CREATE INDEX idx_referral_cases_group_id ON referral_cases(group_id);
-CREATE INDEX idx_referral_cases_created_by_user_id ON referral_cases(created_by_user_id);
-CREATE INDEX idx_referral_cases_reason_code ON referral_cases(reason_code);
-CREATE INDEX idx_referral_cases_status ON referral_cases(status);
-CREATE INDEX idx_referral_cases_shared_with_support ON referral_cases(shared_with_support);
-CREATE INDEX idx_referral_case_notes_case_id ON referral_case_notes(case_id);
-CREATE INDEX idx_referral_case_notes_author_user_id ON referral_case_notes(author_user_id);
 CREATE TABLE subject_risk_status (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     course_id INTEGER NOT NULL,
@@ -222,24 +179,6 @@ CREATE TABLE subject_risk_status (
     FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
     UNIQUE (course_id, student_id)
 );
-CREATE INDEX idx_subject_risk_status_course_id
-    ON subject_risk_status(course_id);
-CREATE INDEX idx_subject_risk_status_student_id
-    ON subject_risk_status(student_id);
-CREATE INDEX idx_subject_risk_status_risk_status
-    ON subject_risk_status(risk_status);
-CREATE INDEX idx_subject_risk_status_is_incomplete
-    ON subject_risk_status(is_incomplete);
-CREATE INDEX idx_referral_cases_target_area
-ON referral_cases(target_area);
-CREATE INDEX idx_referral_cases_closed_by_user_id
-ON referral_cases(closed_by_user_id);
-CREATE INDEX idx_referral_cases_reopened_by_user_id
-ON referral_cases(reopened_by_user_id);
-CREATE INDEX idx_referral_cases_related_teacher_user_id
-ON referral_cases(related_teacher_user_id);
-CREATE INDEX idx_referral_cases_last_status_changed_at
-ON referral_cases(last_status_changed_at);
 CREATE TABLE referral_case_events (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   case_id INTEGER NOT NULL,
@@ -260,14 +199,6 @@ CREATE TABLE referral_case_events (
   FOREIGN KEY (case_id) REFERENCES referral_cases(id) ON DELETE CASCADE,
   FOREIGN KEY (actor_user_id) REFERENCES users(id) ON DELETE RESTRICT
 );
-CREATE INDEX idx_referral_case_events_case_id
-ON referral_case_events(case_id);
-CREATE INDEX idx_referral_case_events_actor_user_id
-ON referral_case_events(actor_user_id);
-CREATE INDEX idx_referral_case_events_event_type
-ON referral_case_events(event_type);
-CREATE INDEX idx_referral_case_events_created_at
-ON referral_case_events(created_at);
 CREATE TABLE course_grade_units (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   course_id INTEGER NOT NULL,
@@ -278,10 +209,6 @@ CREATE TABLE course_grade_units (
   updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE
 );
-CREATE UNIQUE INDEX idx_course_grade_units_unique_course_sort_order
-  ON course_grade_units (course_id, sort_order);
-CREATE INDEX idx_course_grade_units_course_id
-  ON course_grade_units (course_id);
 CREATE TABLE course_grade_entries (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   course_id INTEGER NOT NULL,
@@ -294,14 +221,6 @@ CREATE TABLE course_grade_entries (
   FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
   FOREIGN KEY (grade_unit_id) REFERENCES course_grade_units(id) ON DELETE CASCADE
 );
-CREATE UNIQUE INDEX idx_course_grade_entries_unique_unit_student
-  ON course_grade_entries (grade_unit_id, student_id);
-CREATE INDEX idx_course_grade_entries_course_id
-  ON course_grade_entries (course_id);
-CREATE INDEX idx_course_grade_entries_student_id
-  ON course_grade_entries (student_id);
-CREATE INDEX idx_course_grade_entries_grade_unit_id
-  ON course_grade_entries (grade_unit_id);
 CREATE TABLE course_attendance_non_applicable_days (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   course_id INTEGER NOT NULL,
@@ -313,16 +232,6 @@ CREATE TABLE course_attendance_non_applicable_days (
   FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE,
   FOREIGN KEY (created_by_user_id) REFERENCES users(id) ON DELETE RESTRICT
 );
-CREATE UNIQUE INDEX idx_course_attendance_non_applicable_unique_course_date
-  ON course_attendance_non_applicable_days (course_id, date);
-CREATE INDEX idx_course_attendance_non_applicable_course_id
-  ON course_attendance_non_applicable_days (course_id);
-CREATE INDEX idx_course_attendance_non_applicable_date
-  ON course_attendance_non_applicable_days (date);
-CREATE INDEX idx_attendance_records_course_date
-  ON attendance_records (course_id, date);
-CREATE INDEX idx_attendance_records_course_student_date_status
-  ON attendance_records (course_id, student_id, date, status);
 CREATE TABLE student_traffic_light_snapshots (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   student_id INTEGER NOT NULL,
@@ -336,28 +245,6 @@ CREATE TABLE student_traffic_light_snapshots (
   FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
   UNIQUE (student_id)
 );
-CREATE INDEX idx_student_traffic_light_snapshots_student_id
-  ON student_traffic_light_snapshots (student_id);
-CREATE INDEX idx_student_traffic_light_snapshots_color
-  ON student_traffic_light_snapshots (color);
-CREATE INDEX idx_student_traffic_light_snapshots_calculated_at
-  ON student_traffic_light_snapshots (calculated_at);
-CREATE INDEX idx_incidents_status
-  ON incidents (status);
-CREATE INDEX idx_incidents_student_status
-  ON incidents (student_id, status);
-CREATE INDEX idx_incidents_closed_by_user_id
-  ON incidents (closed_by_user_id);
-CREATE INDEX idx_incidents_course_id
-  ON incidents (course_id);
-CREATE INDEX idx_incidents_group_id
-  ON incidents (group_id);
-CREATE INDEX idx_incidents_source_role
-  ON incidents (source_role);
-CREATE INDEX idx_incidents_last_status_changed_at
-  ON incidents (last_status_changed_at);
-CREATE INDEX idx_incidents_reopened_by_user_id
-  ON incidents (reopened_by_user_id);
 CREATE TABLE incident_notes (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   incident_id INTEGER NOT NULL,
@@ -367,12 +254,6 @@ CREATE TABLE incident_notes (
   FOREIGN KEY (incident_id) REFERENCES incidents(id) ON DELETE CASCADE,
   FOREIGN KEY (author_user_id) REFERENCES users(id) ON DELETE RESTRICT
 );
-CREATE INDEX idx_incident_notes_incident_id
-  ON incident_notes (incident_id);
-CREATE INDEX idx_incident_notes_author_user_id
-  ON incident_notes (author_user_id);
-CREATE INDEX idx_incident_notes_created_at
-  ON incident_notes (created_at);
 CREATE TABLE incident_events (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   incident_id INTEGER NOT NULL,
@@ -392,24 +273,6 @@ CREATE TABLE incident_events (
   FOREIGN KEY (incident_id) REFERENCES incidents(id) ON DELETE CASCADE,
   FOREIGN KEY (actor_user_id) REFERENCES users(id) ON DELETE RESTRICT
 );
-CREATE INDEX idx_incident_events_incident_id
-  ON incident_events (incident_id);
-CREATE INDEX idx_incident_events_actor_user_id
-  ON incident_events (actor_user_id);
-CREATE INDEX idx_incident_events_event_type
-  ON incident_events (event_type);
-CREATE INDEX idx_incident_events_created_at
-  ON incident_events (created_at);
-CREATE INDEX idx_referral_cases_incident_id
-ON referral_cases(incident_id);
-CREATE INDEX idx_referral_cases_created_from_role
-ON referral_cases(created_from_role);
-CREATE INDEX idx_referral_cases_incident_target_area
-ON referral_cases(incident_id, target_area);
-CREATE UNIQUE INDEX idx_referral_cases_unique_open_incident_area
-ON referral_cases(incident_id, target_area)
-WHERE incident_id IS NOT NULL
-  AND status = 'OPEN';
 CREATE TABLE IF NOT EXISTS "cycles" (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   code TEXT NOT NULL UNIQUE,
@@ -424,18 +287,6 @@ CREATE TABLE IF NOT EXISTS "cycles" (
   CHECK (start_date <= end_date),
   UNIQUE (year, ordinal)
 );
-CREATE INDEX idx_cycles_year
-ON cycles(year);
-CREATE INDEX idx_cycles_ordinal
-ON cycles(ordinal);
-CREATE INDEX idx_cycles_year_ordinal
-ON cycles(year, ordinal);
-CREATE INDEX idx_cycles_start_date
-ON cycles(start_date);
-CREATE INDEX idx_cycles_end_date
-ON cycles(end_date);
-CREATE INDEX idx_students_phone
-ON students(phone);
 CREATE TABLE IF NOT EXISTS "users" (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   first_name TEXT NOT NULL,
@@ -460,14 +311,6 @@ CREATE TABLE IF NOT EXISTS "users" (
     )
   )
 );
-CREATE INDEX idx_users_email
-ON users(email);
-CREATE INDEX idx_users_is_active
-ON users(is_active);
-CREATE INDEX idx_users_session_version
-ON users(session_version);
-CREATE INDEX idx_users_last_active_role
-ON users(last_active_role);
 CREATE TABLE IF NOT EXISTS "notifications" (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -490,6 +333,163 @@ CREATE TABLE IF NOT EXISTS "notifications" (
   read_at TEXT NULL,
   created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+CREATE INDEX idx_user_roles_user_id ON user_roles(user_id);
+CREATE INDEX idx_user_roles_role_id ON user_roles(role_id);
+CREATE INDEX idx_groups_cycle_id ON groups(cycle_id);
+CREATE INDEX idx_group_students_cycle_id ON group_students(cycle_id);
+CREATE INDEX idx_group_students_group_id ON group_students(group_id);
+CREATE INDEX idx_group_students_student_id ON group_students(student_id);
+CREATE INDEX idx_courses_cycle_id ON courses(cycle_id);
+CREATE INDEX idx_courses_group_id ON courses(group_id);
+CREATE INDEX idx_courses_subject_id ON courses(subject_id);
+CREATE INDEX idx_courses_teacher_user_id ON courses(teacher_user_id);
+CREATE INDEX idx_group_tutors_tutor_user_id ON group_tutors(tutor_user_id);
+CREATE UNIQUE INDEX idx_attendance_unique_course_student_date
+  ON attendance_records (course_id, student_id, date);
+CREATE INDEX idx_attendance_course_id
+  ON attendance_records (course_id);
+CREATE INDEX idx_attendance_student_id
+  ON attendance_records (student_id);
+CREATE INDEX idx_attendance_date
+  ON attendance_records (date);
+CREATE UNIQUE INDEX idx_grades_unique_course_student_partial
+  ON grades (course_id, student_id, partial_number);
+CREATE INDEX idx_grades_course_id
+  ON grades (course_id);
+CREATE INDEX idx_grades_student_id
+  ON grades (student_id);
+CREATE INDEX idx_grades_partial_number
+  ON grades (partial_number);
+CREATE INDEX idx_incidents_student_id
+  ON incidents (student_id);
+CREATE INDEX idx_incidents_type_code
+  ON incidents (type_code);
+CREATE INDEX idx_incidents_created_by_user_id
+  ON incidents (created_by_user_id);
+CREATE INDEX idx_incidents_created_at
+  ON incidents (created_at);
+CREATE INDEX idx_referral_cases_student_id ON referral_cases(student_id);
+CREATE INDEX idx_referral_cases_group_id ON referral_cases(group_id);
+CREATE INDEX idx_referral_cases_created_by_user_id ON referral_cases(created_by_user_id);
+CREATE INDEX idx_referral_cases_reason_code ON referral_cases(reason_code);
+CREATE INDEX idx_referral_cases_status ON referral_cases(status);
+CREATE INDEX idx_referral_cases_shared_with_support ON referral_cases(shared_with_support);
+CREATE INDEX idx_referral_case_notes_case_id ON referral_case_notes(case_id);
+CREATE INDEX idx_referral_case_notes_author_user_id ON referral_case_notes(author_user_id);
+CREATE INDEX idx_subject_risk_status_course_id
+    ON subject_risk_status(course_id);
+CREATE INDEX idx_subject_risk_status_student_id
+    ON subject_risk_status(student_id);
+CREATE INDEX idx_subject_risk_status_risk_status
+    ON subject_risk_status(risk_status);
+CREATE INDEX idx_subject_risk_status_is_incomplete
+    ON subject_risk_status(is_incomplete);
+CREATE INDEX idx_referral_cases_target_area
+ON referral_cases(target_area);
+CREATE INDEX idx_referral_cases_closed_by_user_id
+ON referral_cases(closed_by_user_id);
+CREATE INDEX idx_referral_cases_reopened_by_user_id
+ON referral_cases(reopened_by_user_id);
+CREATE INDEX idx_referral_cases_related_teacher_user_id
+ON referral_cases(related_teacher_user_id);
+CREATE INDEX idx_referral_cases_last_status_changed_at
+ON referral_cases(last_status_changed_at);
+CREATE INDEX idx_referral_case_events_case_id
+ON referral_case_events(case_id);
+CREATE INDEX idx_referral_case_events_actor_user_id
+ON referral_case_events(actor_user_id);
+CREATE INDEX idx_referral_case_events_event_type
+ON referral_case_events(event_type);
+CREATE INDEX idx_referral_case_events_created_at
+ON referral_case_events(created_at);
+CREATE UNIQUE INDEX idx_course_grade_units_unique_course_sort_order
+  ON course_grade_units (course_id, sort_order);
+CREATE INDEX idx_course_grade_units_course_id
+  ON course_grade_units (course_id);
+CREATE UNIQUE INDEX idx_course_grade_entries_unique_unit_student
+  ON course_grade_entries (grade_unit_id, student_id);
+CREATE INDEX idx_course_grade_entries_course_id
+  ON course_grade_entries (course_id);
+CREATE INDEX idx_course_grade_entries_student_id
+  ON course_grade_entries (student_id);
+CREATE INDEX idx_course_grade_entries_grade_unit_id
+  ON course_grade_entries (grade_unit_id);
+CREATE UNIQUE INDEX idx_course_attendance_non_applicable_unique_course_date
+  ON course_attendance_non_applicable_days (course_id, date);
+CREATE INDEX idx_course_attendance_non_applicable_course_id
+  ON course_attendance_non_applicable_days (course_id);
+CREATE INDEX idx_course_attendance_non_applicable_date
+  ON course_attendance_non_applicable_days (date);
+CREATE INDEX idx_attendance_records_course_date
+  ON attendance_records (course_id, date);
+CREATE INDEX idx_attendance_records_course_student_date_status
+  ON attendance_records (course_id, student_id, date, status);
+CREATE INDEX idx_student_traffic_light_snapshots_student_id
+  ON student_traffic_light_snapshots (student_id);
+CREATE INDEX idx_student_traffic_light_snapshots_color
+  ON student_traffic_light_snapshots (color);
+CREATE INDEX idx_student_traffic_light_snapshots_calculated_at
+  ON student_traffic_light_snapshots (calculated_at);
+CREATE INDEX idx_incidents_status
+  ON incidents (status);
+CREATE INDEX idx_incidents_student_status
+  ON incidents (student_id, status);
+CREATE INDEX idx_incidents_closed_by_user_id
+  ON incidents (closed_by_user_id);
+CREATE INDEX idx_incidents_course_id
+  ON incidents (course_id);
+CREATE INDEX idx_incidents_group_id
+  ON incidents (group_id);
+CREATE INDEX idx_incidents_source_role
+  ON incidents (source_role);
+CREATE INDEX idx_incidents_last_status_changed_at
+  ON incidents (last_status_changed_at);
+CREATE INDEX idx_incidents_reopened_by_user_id
+  ON incidents (reopened_by_user_id);
+CREATE INDEX idx_incident_notes_incident_id
+  ON incident_notes (incident_id);
+CREATE INDEX idx_incident_notes_author_user_id
+  ON incident_notes (author_user_id);
+CREATE INDEX idx_incident_notes_created_at
+  ON incident_notes (created_at);
+CREATE INDEX idx_incident_events_incident_id
+  ON incident_events (incident_id);
+CREATE INDEX idx_incident_events_actor_user_id
+  ON incident_events (actor_user_id);
+CREATE INDEX idx_incident_events_event_type
+  ON incident_events (event_type);
+CREATE INDEX idx_incident_events_created_at
+  ON incident_events (created_at);
+CREATE INDEX idx_referral_cases_incident_id
+ON referral_cases(incident_id);
+CREATE INDEX idx_referral_cases_created_from_role
+ON referral_cases(created_from_role);
+CREATE INDEX idx_referral_cases_incident_target_area
+ON referral_cases(incident_id, target_area);
+CREATE UNIQUE INDEX idx_referral_cases_unique_open_incident_area
+ON referral_cases(incident_id, target_area)
+WHERE incident_id IS NOT NULL
+  AND status = 'OPEN';
+CREATE INDEX idx_cycles_year
+ON cycles(year);
+CREATE INDEX idx_cycles_ordinal
+ON cycles(ordinal);
+CREATE INDEX idx_cycles_year_ordinal
+ON cycles(year, ordinal);
+CREATE INDEX idx_cycles_start_date
+ON cycles(start_date);
+CREATE INDEX idx_cycles_end_date
+ON cycles(end_date);
+CREATE INDEX idx_students_phone
+ON students(phone);
+CREATE INDEX idx_users_email
+ON users(email);
+CREATE INDEX idx_users_is_active
+ON users(is_active);
+CREATE INDEX idx_users_session_version
+ON users(session_version);
+CREATE INDEX idx_users_last_active_role
+ON users(last_active_role);
 CREATE INDEX idx_notifications_user_read_created
   ON notifications (user_id, is_read, created_at);
 CREATE INDEX idx_notifications_context
