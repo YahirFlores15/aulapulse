@@ -1,0 +1,2 @@
+-- Parte 0 no necesita más catálogos todavía.
+-- Se deja este archivo para respetar la estructura base.
